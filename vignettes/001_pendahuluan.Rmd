@@ -130,7 +130,10 @@ sd(iris$Sepal.Length) # ___
 median(iris$Sepal.Width) # nilai tengah dari kolom sepal.length
 sum(iris$Petal.Length) # jumlah dari kolom sepal.length
 cor(iris[, -5]) # ___
-
+#calculate value, tapi tidak menyimpan sebagai obyek
+#untuk menyimpan tambahkan nama_variable <- fungsi.
+#contoh: average_sepal_length <-mean(iris$Sepal.Length)
+(average_sepal_length <- mean(iris$Sepal.Length))
 #fungsi yang hanya menampilkan, tapi tidak menghitung 
 plot(iris) # menampilkan grafik plot
 write.csv(iris, file = "iris.csv", row.names = FALSE) # ___

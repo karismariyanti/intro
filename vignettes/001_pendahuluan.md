@@ -655,7 +655,7 @@ iris[ ,2, drop = FALSE] # subset atau ekstrak data pada kolom 2, drop = false me
 ```
 
 ```r
-iris[2,2] # ___
+iris[2,2] # menampilkan nilai di baris 2 kolom 2
 ```
 
 ```
@@ -711,7 +711,7 @@ length(levels(iris$Species)) # ___
 ```
 
 ```r
-unique(iris$Species) # ___
+unique(iris$Species) # distinct data
 ```
 
 ```
@@ -720,7 +720,7 @@ unique(iris$Species) # ___
 ```
 
 ```r
-length(unique(iris$Species)) # ___
+length(unique(iris$Species)) # count dari dictinct data
 ```
 
 ```
@@ -728,7 +728,7 @@ length(unique(iris$Species)) # ___
 ```
 
 ```r
-mean(iris$Sepal.Length) # ___
+mean(iris$Sepal.Length) # rata-rata dari kolom sepal.length
 ```
 
 ```
@@ -744,7 +744,7 @@ sd(iris$Sepal.Length) # ___
 ```
 
 ```r
-median(iris$Sepal.Width) # ___
+median(iris$Sepal.Width) # nilai tengah dari kolom sepal.length
 ```
 
 ```
@@ -752,18 +752,12 @@ median(iris$Sepal.Width) # ___
 ```
 
 ```r
-sum(iris$Petal.Length) # ___
+sum(iris$Petal.Length) # jumlah dari kolom sepal.length
 ```
 
 ```
 ## [1] 563.7
 ```
-
-```r
-plot(iris) # ___
-```
-
-![](001_pendahuluan_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 ```r
 cor(iris[, -5]) # ___
@@ -776,6 +770,24 @@ cor(iris[, -5]) # ___
 ## Petal.Length    0.8717538  -0.4284401    1.0000000   0.9628654
 ## Petal.Width     0.8179411  -0.3661259    0.9628654   1.0000000
 ```
+
+```r
+#calculate value, tapi tidak menyimpan sebagai obyek
+#untuk menyimpan tambahkan nama_variable <- fungsi.
+#contoh: average_sepal_length <-mean(iris$Sepal.Length)
+(average_sepal_length <- mean(iris$Sepal.Length))
+```
+
+```
+## [1] 5.843333
+```
+
+```r
+#fungsi yang hanya menampilkan, tapi tidak menghitung 
+plot(iris) # menampilkan grafik plot
+```
+
+![](001_pendahuluan_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 ```r
 write.csv(iris, file = "iris.csv", row.names = FALSE) # ___
