@@ -3,7 +3,7 @@ title: "Transformasi Data"
 author: "Muhammad Aswan Syahputra"
 date: "4/9/2019"
 output:
-  html_document: 
+  html_document:
     df_print: default
     fig_height: 6
     fig_width: 9
@@ -13,7 +13,9 @@ output:
     toc: yes
     toc_collapsed: yes
     toc_float: yes
-editor_options: 
+  pdf_document:
+    toc: yes
+editor_options:
   chunk_output_type: inline
 ---
 
@@ -25,45 +27,115 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Anda akan menggunakan fungsi `spread` dari paket `tidyr` untuk mengubah memperbaiki dataset 'table2' (juga dari paket `tidyr`). Aktifkanlah paket `tidyr`, lihat dataset 'table2'. Apakah yang membuat dataset tersebut *non-tidy* data? Bukalah dokumentasi fungsi `spread` dengan menjalankan `?nama_fungsi` atau `help(nama_fungsi)`!
 
+#install package
 ```{r}
-___(tidyr)
+#install.packages("tidyr")
+#install.packages("skimr")
+```
+#Aktifkanlah paket `tidyr`
+
+```{r}
+#___(tidyr)
+library(tidyr)
 table2
 ```
+
+Catatan: tabel2 tidak tidy karena cases dan population dijadikan value, seharusnya kolom.
 
 Dataset 'table2' dapat diperbaiki dengan menjalankan kode berikut:
 
 ```{r}
 table2_tidy <- spread(table2, key = "type", value = "count")
+#spread vs gahter. spread harus tau nama kolomnya. gather tidak harus tau nama kolomnya
+#key kolom yang akan diubah menjadi nama kolom
+#
+#ubah key adalah kolom dari type, value adalah value dari count
+table2_tidy
 ```
 
 Selanjutnya Anda juga akan memperbaiki dataset 'table4a'. Cetaklah dataset tersebut dan dapatkah Anda menyebutkan alasan mengapa dataset tersebut tidak *tidy* dan *tame*?
 
 ```{r}
-___ # cetak dataset table4a
+table4a # cetak dataset table4a
 ```
+catatan: tabel4a tidak tidy karena ada data observasi 1999 2000, malah jadi kolom
 
 Dataset 'table4a' dapat diperbaiki dengan menggunakan fungsi `gather` dari `tidyr`. Anda dapat mempelajari fungsi tersebut dengan menjalankan `?gather`.
 
 ```{r}
-gather(table4a, key = "year", value = "case", 2:3)
+?gather #menampilkan help diawali dengan ?
+#gather mengubah kolom dimana saat kita ngga perlu tahu nama kolomnya, cukup gunakan index. perlu buat kolom baru
 
+gather(table4a, key = "year", value = "case", 2:3) #pakai index
+gather(table4a, key = "year", value = "case", `1999`:`2000`) #atau pakai nama kolom. catatan: kalo pakai angka harus pakai backtick
+gather(table4a, key = "year", value = "case", c(2,3)) #atau c jika tidak berurutan
+
+#cara 1 pakai pipe
 table4a_tidy <- table4a %>% 
-  gather(key = "year", value = "cases", 2:3) # menggunakan tidyverse syntax, pipe %>%
+  gather(key = "year", value = "kasus", 2:3) # menggunakan tidyverse syntax, pipe %>%
+table4a_tidy
+
+#cara 2 pakai intermediate object
+table4a_tidy <- gather(table4a, key = "year", value = "kasus", 2:3) 
+table4a_tidy
 ```
 
 Silakan lakukan hal serupa pada dataset 'table4b' namun dengan menggunakan "population" sebagai isian argumen `value`. Tuliskan juga dengan menggunakan *tidyverse syntax* dan simpan obyek tersebut dengan nama 'table4b_tidy'!
 
 ```{r}
 table4b
+str(table4b)
+#cara 1 pakai pipe
+table4b_tidy <- table4b %>%
+    gather(key ="year", value ="population", 2:3)
+#cara 2 pakai Intermediate object
+table4b_tidy <- gather(table4b, key ="year", value ="population", 2:3)
+table4b_tidy
 
-table4b_tidy <- ___
 ```
 
 Dataset 'table4a_tidy' dan 'table4b_tidy' tersebut dapat digabungkan menjadi satu dataset. Hal tersebut dapat dilakukan dengan menggunakan fungsi `left_join` dari paket `dplyr` seperti contoh berikut:
 
 ```{r}
-___ # mengaktifkan paket dplyr
-mydata <- left_join(table4a_tidy, table4b_tidy)
+library(dplyr) # mengaktifkan paket dplyr
+table4a_tidy
+table4b_tidy
+mydata <- left_join(table4a_tidy, table4b_tidy, by = c("country", "year"))
+mydata
+
+#mengurutkan data cara 1
+?arrange
+mydata <- mydata %>%
+  arrange(country)
+mydata
+
+#mengurutkan data cara 2
+mydata <- arrange(mydata, country)
+mydata
+
+#cek kesamaan 2 tabel
+identical(table1,mydata) #menghasilkan FALSE, artinya tidak identik dengan tabel 1 karena tipe data year berbeda.
+#perlu kembali lagi kebagian gather, ditambahkan sintax convert = TRUE
+
+#cara 2 pakai intermediate object
+table4a_tidy
+table4a_tidyy <- gather(table4a, key = "year", value = "kasus", 2:3, convert = TRUE) 
+table4a_tidyy
+
+#cara 2 pakai Intermediate object
+table4b_tidy
+table4b_tidyy <- gather(table4b, key ="year", value ="population", 2:3, convert = TRUE)
+table4b_tidyy
+
+#join lagi untuk tabel yy
+mydata <- left_join(table4a_tidyy, table4b_tidyy, by = c("country", "year"))
+mydata
+
+mydata <- arrange(mydata, country)
+mydata
+
+identical(table1,mydata)
+
 ```
 
 
@@ -72,8 +144,10 @@ mydata <- left_join(table4a_tidy, table4b_tidy)
 Dataset mydata tersebut merupakan subset dataset Tubercolusis yang diolah dari data 'who' dan 'population' (dari paket `tidyr`). Lihatlah ringkasan kedua tersebut dengan menggunakan `glimpse`!
 
 ```{r}
-___(who)
-___(population)
+#___(who)
+#___
+glimpse(who)
+glimpse(population)
 ```
 
 Sekarang kita akan membuat versi utuh dari dataset 'mydata' dengan menggunakan data seluruh negara pada dataset 'who' sebagai berikut:
@@ -81,13 +155,19 @@ Sekarang kita akan membuat versi utuh dari dataset 'mydata' dengan menggunakan d
 ```{r}
 # Menjalankan fungsi satu per satu
 tb1 <- gather(who, key = "key", value = "case", new_sp_m014:newrel_f65)
+View(tb1)
+#cara lain untuk menampilkan langsung ke layar, tambah kurung diawal dan akhir
+(tb1 <- gather(who, key = "key", value = "case", new_sp_m014:newrel_f65))
 tb2 <- select(tb1, country, year, case)
+View(tb2)
 tb3 <- group_by(tb2, country, year)
-tb4 <- summarise(tb3, cases = sum(case, na.rm = TRUE))
-tb5 <- ungroup(tb4)
-tb6 <- left_join(tb5, population)
-tb7 <- filter(tb6, !is.na(population))
-tb8 <- mutate(tb7, proportion = 100*cases/population)
+View(tb3)
+tb4 <- summarise(tb3, cases = sum(case, na.rm = TRUE)) #mengabaikan nilai N/A
+View(tb4)
+(tb5 <- ungroup(tb4))
+(tb6 <- left_join(tb5, population))
+(tb7 <- filter(tb6, !is.na(population)))
+(tb8 <- mutate(tb7, proportion = 100*cases/population))
 
 # Syntax menggunakan pipe %>%
 
@@ -98,7 +178,7 @@ tb_all <-
   group_by(country, year) %>% 
   summarise(cases = sum(case, na.rm = TRUE)) %>% 
   ungroup() %>% 
-  left_join(population) %>% 
+  left_join(population, by = c("country", "year")) %>% 
   filter(!is.na(population)) %>% 
   mutate(proportion = 100*cases/population)
 ```
@@ -117,6 +197,6 @@ Dapatkah Anda membuat ringkasan apa saja hal apa saja yang dilakukan pada proses
 Cek apakah dataset 'tb8' sama dengan dataset 'tb_all'! Menurut Anda, cara penulisan *syntax* manakah yang lebih mudah digunakan dan dipahami?
 
 ```{r}
-___(tb8, tb_all)
+identical(tb8, tb_all)
 ```
 

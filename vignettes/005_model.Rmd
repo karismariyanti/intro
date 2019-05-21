@@ -26,10 +26,11 @@ Pemodelan bertujuan utama untuk menyederhanakan suatu fenomena sehingga melalui 
 Terdapat berbagai jenis model tersedia saat ini, contohnya : *tree-based model*, *neural network*, *deep learning* dan lain-lain. Namun, pada modul pengantar ini kita akan mempelajari satu jenis model mendasar yaitu regresi linier untuk membentuk pemahaman mengenai konsep modeling. Paket yang akan digunakan adalah `readr`, `modelr`, `broom` dan `ggplot2`. Aktifkanlah semua paket tersebut!
 
 ```{r}
-# ___
-# ___
-# ___
-# ___
+library(readr)
+library(modelr)
+library(broom)
+library(ggplot2)
+
 ```
 
 Dalam regresi linier selalu hanya ada satu *outcome variable* `y` dan satu atau lebih *predictor/explanatory variable(s)*. Anda akan mempergunakan dataset `evals` untuk melakukan pemodelan. Dataset `evals` tersebut berisikan skor penilaian terhadap pengajar beserta faktor-faktor lain yang berkaitan dengan individu pengajar atau kelas yang diajar. Imporlah dataset tersebut dengan melengkapi baris kode dibawah ini. Ada berapa observasi dan ada variabel pada dataset tersebut?
@@ -37,6 +38,7 @@ Dalam regresi linier selalu hanya ada satu *outcome variable* `y` dan satu atau 
 ```{r}
 evals <- read_csv("../data-raw/evals.csv")
 evals
+str(evals)
 ```
 
 Dalam studi kasus ini, Anda akan melakukan pemodelan untuk mempelajari hal-hal apa saja yang kemungkinan dapat mempengaruhi skor penilaian pengajar (variabel: `score`). Pembuatan model umumnya menggunakan *formula syntax* dengan format berikut:
@@ -47,8 +49,11 @@ model <- model_function(y ~ x1 + ... xn, data = dataset)
 Anda ingin mengetahui hal-hal apa sajakah yang dapat mempengaruhi skor penilaian pengajar (`score`). Pertama Anda akan melakukan pengamatan pada variabel `bty_avg`. Lakukanlah pengamatan dengan membuat scatterplot dengan `bty_avg` pada sumbu x dan `score` pada sumbu y!
 
 ```{r}
-ggplot(evals, aes(x = ___, y = ___)) +
-  geom____()
+#ggplot(evals, aes(x = ___, y = ___)) +
+#  geom____()
+
+ggplot(evals, aes(x = bty_avg, y = score)) +
+  geom_point()
 ```
 
 Anda mendapati suatu fenomena pada grafik diatas, yaitu *overplotting*. *Overplotting* adalah kondisi dimana banyak titik-titik yang bertumpuk karena memiliki nilai yang sama. Hal tersebut dapat diperbaiki dengan menggunakan *jitter*. Dapatkah Anda menemukan perbedaan antara grafik di atas dengan grafik berikut? Berilah judul pada grafik berikut dan grafik sebelumnya.
@@ -56,22 +61,26 @@ Anda mendapati suatu fenomena pada grafik diatas, yaitu *overplotting*. *Overplo
 ```{r}
 ggplot(evals, aes(x = bty_avg, y = score)) +
   geom_jitter() +
-  labs(title = "___")
+  labs(title = "Judul Grafik")
 ```
 
 Anda mendapati bahwa hanya dengan melakukan pengamatan dari grafik tidaklah cukup untuk mempelajari keterkaitan antara `score` dan `bty_avg`. Oleh karena itu, Anda ingin membuat pemodelan regresi linier untuk mempelajari keterkaitan antara kedua variabel tersebut. Buatlah pemodelan tersebut dengan menggunakan fungsi `lm()` dan simpanlah hasilnya dengan nama 'model1'! (Petunjuk: Jalankan `?lm` untuk membaca dokumentasi). Dapatkah Anda menuliskan persamaan linear yang didapatkan dari model1 tersebut?
+
+lm = linier model
+~ dibaca dipengaruhi
 
 ```{r}
 model1 <- lm(score ~ bty_avg, data = evals)
 model1
 ```
+artinya: jika bty_avg meningkat 1 poin, penilaiannya meningkat 0.06
 
 Anda dapat mengetahui kualitas dari model yang telah dibuat dengan menggunakan fungsi `summary()` atau `glance()` dan `tidy` (dari paket `broom`). Apakah perbedaan utama dari penggunaan kedua fungsi tersebut?
 
 ```{r}
-summary(model1)
-glance(model1)
-tidy(model1)
+summary(model1) #perhitungan kesimpulan: tidak dapat merangkum/eksplain modelnya
+glance(model1) #ditampilkan dalam tabel, hasilnya sama dengan summary(0)
+tidy(model1) #merangkum nilai estimate
 ```
 
 Selanjutnya Anda ingin mengetahui `fitted value` (nilai `y hat` yang didapatkan dari model) dan menambahkannya ke dalam scatterplot. Setidaknya ada dua cara untuk melakukan hal tersebut seperti contoh berikut: (lengkapi bagian "___")
@@ -81,23 +90,31 @@ Selanjutnya Anda ingin mengetahui `fitted value` (nilai `y hat` yang didapatkan 
 model1_vals_broom <- 
   model1 %>% 
   augment()
+model1_vals_broom
 
 ggplot(model1_vals_broom, aes(x = bty_avg, y = score)) +
-  geom____() +
+  geom_point() +
   geom_line(aes(y = .fitted))
+  geom_pointrange(aes(ymax = bty_avg, y = .fitted))
 
 # menggunakan paket modelr
 model1_vals_modelr <- 
   evals %>% 
   add_predictions(model1) %>% 
   add_residuals(model1)
+model1_vals_modelr
+
+#catatan: dataset tetap terjaga, namun ditambahkan hasil perhitungan
 
 ggplot(model1_vals_modelr, aes(x = bty_avg, y = score)) +
-  geom____() +
+  geom_point() +
   geom_line(aes(y = pred))
 ```
 
 Perbedaan apa yang paling nampak antara `model1_vals_broom` dan `model1_vals_modelr`?
+
+broom menampilkan nilai yang ada di model + statistik
+model r menampilkan set komplit + prediction = residual
 
 ```{r}
 model1_vals_broom
@@ -108,17 +125,17 @@ Menariknya, dengan menggunakan `ggplot2` Anda bisa langsung menambahkan garis `f
 
 ```{r}
 ggplot(evals, aes(x = bty_avg, y = score)) +
-  geom____() +
-  geom_smooth(method = "___")
+  geom_point() +
+  geom_smooth(method = "lm")
 ```
 
 
 Selanjutnya Anda tertarik untuk mempelajari keterkaitan antara `score` dengan `age`. Buatlah model untuk kedua variabel tersebut dan simpanlah dengan nama `model2`. Periksa bagaimana kualitas dari `model2` tersebut serta buatlah grafik menggunakan ggplot yang menyertakan garis `fitted value`!
 
 ```{r}
-model2 <- ___
+model2 <- lm(score ~ age, data = evals)
 
-ggplot(evals, aes(x = ___, y = ___)) +
+ggplot(evals, aes(x = age, y = score)) +
   geom_jitter() +
   geom_smooth(method = "lm")
 ```
@@ -129,6 +146,7 @@ Anda telah membuat `model1` dan `model2` untuk mempelajari variabel `score`. And
 evals %>% 
   gather_predictions(model1, model2) %>% 
   ggplot(aes(x = pred, y = score, colour = model)) +
-  geom____() +
-  geom_smooth(method = "lm", se = FALSE)
+  geom_jitter() +
+  geom_smooth(method = "lm", se = FALSE)+
+  facet_wrap(~model, scales = "free")
 ```

@@ -24,14 +24,21 @@ knitr::opts_chunk$set(echo = TRUE)
 Dalam modul visualisasi ini, Anda akan menggunakan data `evals` dan paket `ggplot2`. Aktifkanlah paket untuk mengimpor data dan paket `ggplot2`!
 
 ```{r}
-___
-___
+#install.packages("readr")
+library(readr)
+#install.packages("ggplot2")
+library(ggplot2)
+
+#untuk menggantikan import data, pembuatan grafik
+#install.packages("tidyverse")
+#library(tidyverse)
+
 ```
 
 Sekarang impor dataset `evals` melalui pranala "https://www.openintro.org/stat/data/evals.csv". Simpan obyek data tersebut dengan nama `evals`. (Petunjuk: `?read_csv`)
 
 ```{r}
-evals <- read_csv("___")
+evals <- read_csv("https://www.openintro.org/stat/data/evals.csv")
 evals
 ```
 
@@ -52,50 +59,86 @@ ggplot(data = evals, aes(x = age, y = bty_avg)) +
 Sekarang dapatkah Anda membuat grafik dengan `gender` pada sumbu x dan `bty_avg` pada sumbu y? Serta gantilah `geom_point()` menjadi `geom_boxplot`. Grafik dan informasi apakah yang Anda dapatkan?
 
 ```{r}
-ggplot(data = evals, aes(x = ___, y = bty_avg)) +
-  ___
+#ggplot(data = evals, aes(x = ___, y = bty_avg)) +
+#  ___
+
+ggplot(data = evals, aes(x = gender, y = bty_avg)) +
+  geom_boxplot()
 ```
 
 
 Anda dapat menambahkan informasi mengenai variabel lain kedalam plot dengan menempatkannya pada bagian `aes()` dengan menggunakan `aesthetic` yang sesuai. Apa yang akan terjadi saat anda menambahkan informasi 'colour = gender' pada baris kode berikut?
 
 ```{r}
-ggplot(data = evals, aes(x = age, y = bty_avg, colour = ___)) +
+#ggplot(data = evals, aes(x = age, y = bty_avg, colour = ___)) +
+#  geom_point()
+ggplot(data = evals, aes(x = age, y = bty_avg, colour = gender)) +
   geom_point()
 ```
 
 Selain menambahkan `aesthetic`, Anda juga dapat menambahkan `geometry` dengan cara menggunakan tanda `+`. Apa yang akan terjadi jika Anda menambahkan `geom_line` pada baris kode berikut? Menurut Anda data apakah yang cocok digunakan untuk jenis grafik tersebut?
 
 ```{r}
+#ggplot(data = evals, aes(x = age, y = bty_avg, colour = gender)) +
+#  geom_point() +
+#  ___
 ggplot(data = evals, aes(x = age, y = bty_avg, colour = gender)) +
   geom_point() +
-  ___
+  geom_line()
 ```
 
 Pada contoh-contoh di atas, Anda menggunakan nilai `x` dan `y` sebagai `aesthetic`. Bagaimana jika Anda hanya menggunakan `x` saja? Jenis `geometry` apakah yang cocok digunakan jika hanya menggunakan satu nilai `x` tersebut? (Petunjuk: distribusi data)
 
 ```{r}
+#ggplot(data = evals, aes(x = age)) +
+#  geom____(binwidth = 5)
+
 ggplot(data = evals, aes(x = age)) +
-  geom____(binwidth = 5)
+  geom_histogram(binwidth = 5)
 ```
 
 Anda juga dapat membuat grafik yang berisi prediksi model dengan menggunakan `geom_smooth`. Buatlah grafik tersebut dengan menggunakan `geom_point()` dan `geom_smooth()`! Sumbu `x` adalah 'age' dan sumbu `y` adalag 'score'. (Pada contoh ini kita akan menggunakan metode regresi linear untuk model, sehingga argumen pada `geom_smooth()` diisi dengan 'method = "lm"').
 
 ```{r}
-ggplot(data = evals, aes(x = ___, y = ___)) +
-  ___ +
-  geom____(method = "lm")
+#ggplot(data = evals, aes(x = ___, y = ___)) +
+#  ___ +
+#  geom____(method = "lm")
+ggplot(data = evals, aes(x = age, y = score)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+ggplot(data = evals, aes(x = age, y = score)) +
+  geom_point() +
+  geom_smooth(method = "loess")
+
+ggplot(data = evals, aes(x = age, y = score)) +
+  geom_jitter() +
+  geom_smooth(method = "loess")
+
 ```
 
 Bagaimana jika Anda menambahkan argumen 'colour = ethnicity' ke dalam `aes()`? Apakah yang terjadi dan dapatkah Anda menjelaskannya? Anda dipersilahkan untuk  mengganti label atau menambahkan judul pada grafik dengan menggunakan `labs`.
 
 ```{r}
-ggplot(data = evals, aes(x = age, y = score, colour = ___)) +
-  geom_point() +
+#ggplot(data = evals, aes(x = age, y = score, colour = ___)) +
+#  geom_point() +
+#  geom_smooth(method = "lm") +
+#  labs(
+#    x = "___",
+#    y = "___",
+#    title = "___"
+#  )
+
+ggplot(data = evals, aes(x = age, y = score, colour = ethnicity)) +
+  geom_jitter() +
+  scale_colour_manual(values = c("minority" = "green", "not minority" = "red")) +
   geom_smooth(method = "lm") +
   labs(
-    x = "___",
-    y = "___",
-    title = "___"
+    x = "usia",
+    y = "score",
+    title = "Grafik antara Score terhadap Usia",
+    subtitle = "Subtitle",
+    caption = "Sumber Data: Data olahan 2019",
+    color = "etnik"
   )
 ```
